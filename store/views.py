@@ -92,3 +92,7 @@ def processOrder(request):
 
 
     return JsonResponse('Payment Complete', safe=False)
+
+
+def signupuser(request):
+    
