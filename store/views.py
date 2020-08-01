@@ -1,12 +1,17 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import JsonResponse
 from .models import *
 import json
 import datetime
 from .utils import cookieCart, cartData, guestOrder
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth import login, logout, authenticate
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from django.db import IntegrityError
 
 
 def store(request):
+
     data = cartData(request)
     cartItems = data['cartItems']
 
@@ -95,4 +100,42 @@ def processOrder(request):
 
 
 def signupuser(request):
-    
+    if request.method == 'GET':
+        return render(request, "store/signupuser.html", {'form': UserCreationForm()})
+    else:
+        if request.POST['password1'] == request.POST['password2']:
+            try:
+                user = User.objects.create_user(request.POST['username'], password=request.POST['password1'])
+                user.save()
+                print(request.body,">>>>>>>>>>>>>>>>>>>")
+                email = request.POST['username']
+
+                request.user.customer = Customer.objects.get_or_create(user=user,email= email, name=email.split('@')[0])
+                login(request, user)
+
+                return redirect('store')
+            except IntegrityError:
+                return render(request, "store/signupuser.html",
+                              {'form': UserCreationForm(), 'error': 'This user name has already taken'})
+        else:
+            # Tell the user the password didn't match
+            return render(request, "store/signupuser.html",
+                          {'form': UserCreationForm(), 'error': 'password did not match'})
+
+@login_required
+def logoutuser(request):
+    if request.method == 'POST':
+        logout(request)
+        return redirect('store')
+
+def loginuser(request):
+    if request.method == 'GET':
+        return render(request, "store/loginuser.html", {'form': AuthenticationForm()})
+    else:
+        user = authenticate(request, username=request.POST['username'], password=request.POST['password'])
+        if user is None:
+            return render(request, "store/loginuser.html",
+                          {'form': AuthenticationForm(), 'error': 'username and password did not match'})
+        else:
+            login(request, user)
+            return redirect('store')

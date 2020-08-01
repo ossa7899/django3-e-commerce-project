@@ -85,7 +85,22 @@
             </li>
         </ul>
         <div class="form-inline my-2 my-lg-0">
-            <a href="#" class="btn btn-warning">Login</a>
+            {% if user.is_authenticated %}
+                <li class="nav-item">
+                    <a href="#" onclick="$('#signOutBtn').click()" class="nav-link">Logout</a>
+                    <form style='display: none;' method="POST" action="{% url 'logoutuser' %}">
+                        {% csrf_token %}
+                        <button id="signOutBtn" type="submit">Logout</button>
+                    </form>
+                </li>
+            {% else %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'signupuser' %}">Sign Up</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'loginuser' %}">Login</a>
+                </li>
+            {% endif %}
             <a href="{% url 'cart' %}">
                 <img id="cart-icon" src="{% static 'images/cart.png' %}">
             </a>

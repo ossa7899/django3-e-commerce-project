@@ -26,7 +26,9 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('store.urls')),
     path('zarinpal/', include('zarinpal.urls')),
-    path('signup/', views.signupuser, name='signupuser')
+    path('signup', views.signupuser, name='signupuser'),
+    path('logout', views.logoutuser, name='logoutuser'),
+    path('login', views.loginuser, name='loginuser'),
 ]
 
 urlpatterns += static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)

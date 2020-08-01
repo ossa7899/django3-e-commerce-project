@@ -15,7 +15,8 @@ CallbackURL = 'http://localhost:8000/zarinpal/verify/' # Important: need to edit
 def send_request(request):
     data = cartData(request)
     order = data['order']
-    amount = order.get_cart_total
+    print(order)
+    amount = order["get_cart_total"]
     result = client.service.PaymentRequest(MERCHANT, amount, description, email, mobile, CallbackURL)
     if result.Status == 100:
         return redirect('https://www.zarinpal.com/pg/StartPay/' + str(result.Authority))
